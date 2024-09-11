@@ -31,10 +31,10 @@ export const userSchema = z.object({
 export type IUserInfo = z.infer<typeof userSchema>
 
 export const loginFormSchema = z.object({
-  email: z
+  username: z
     .string()
     .min(1, {
-      message: "Email is required",
+      message: "Username is required",
     })
     .email(),
   password: z.string().min(1, {

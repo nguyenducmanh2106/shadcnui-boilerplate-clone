@@ -19,10 +19,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useUserMutation } from "@/hooks/query/use-user"
+// import { useUserMutation } from "@/hooks/query/use-user"
 import { cn } from "@/lib/utils"
 import type { ILoginForm } from "@/models/user"
 import { loginFormSchema } from "@/models/user"
+import { useMutation } from "@tanstack/react-query"
+import { postAuth } from "@/api/services/AuthService"
+import { Code, type ResponseData, type UserLogin } from "@/api"
 
 export function Component() {
   const { t } = useTranslation()
@@ -90,12 +93,23 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { t } = useTranslation()
 
+  const useUserMutation = () => {
+    return useMutation({
+      mutationFn: async (params: any) => {
+        let bodyRequest: UserLogin = {
+          username: params.username,
+          password: params.password
+        }
+        return await postAuth("", bodyRequest)
+      }
+    })
+  }
   const loginMutation = useUserMutation()
   const navigate = useNavigate()
   const form = useForm<ILoginForm>({
     resolver: zodResolver(loginFormSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   })
@@ -104,11 +118,15 @@ function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     toast.promise(loginMutation.mutateAsync(values), {
       position: "top-center",
       loading: t("login.loading"),
-      success: () => {
-        navigate("/dashboard", {
-          replace: true,
-        })
-        return t("login.login_successful")
+      success: (response: ResponseData) => {
+        console.log(response)
+        if (response.code === Code._200) {
+          navigate("/dashboard", {
+            replace: true,
+          })
+          return t("login.login_successful")
+        }
+        return response.message ?? t("login.error")
       },
       error: t("login.error"),
     })
@@ -124,17 +142,17 @@ function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           <div className="grid gap-2">
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem className="grid gap-1">
-                  <FormLabel className="sr-only">{t("login.email")}</FormLabel>
+                  <FormLabel className="sr-only">{t("login.username")}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       placeholder={t("login.email_placeholder")}
-                      type="email"
+                      type="text"
                       autoCapitalize="none"
-                      autoComplete="email"
+                      autoComplete="off"
                       autoCorrect="off"
                       disabled={loginMutation.isPending}
                     />
