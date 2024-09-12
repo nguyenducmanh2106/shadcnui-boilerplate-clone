@@ -38,7 +38,7 @@ export const apiFetch = ofetch.create({
   },
 })
 
-function redirectToSignin() {
+export function redirectToSignin() {
   const requestUrl = new URL(window.location.href)
   const redirectTo = requestUrl.pathname + requestUrl.search
   const loginParams = redirectTo ? new URLSearchParams({ redirectTo }) : null

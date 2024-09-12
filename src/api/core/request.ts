@@ -7,6 +7,7 @@ import type { ApiResult } from './ApiResult';
 import { CancelablePromise } from './CancelablePromise';
 import type { OnCancel } from './CancelablePromise';
 import { OpenAPI } from './OpenAPI';
+import { redirectToSignin } from '@/lib/api-fetch';
 
 function isDefined<T>(value: T | null | undefined): value is Exclude<T, null | undefined> {
     return value !== undefined && value !== null;
@@ -238,7 +239,17 @@ function catchErrors(options: ApiRequestOptions, result: ApiResult): void {
         503: 'Service Unavailable',
         ...options.errors,
     }
-
+    if (result.status === 401) {
+        redirectToSignin()
+    }
+    try {
+        const json = JSON.parse(result.body)
+        if (result.status === 400 && json.code === 1003) {
+            redirectToSignin()
+        }
+    } catch {
+        // ignore
+    }
     const error = errors[result.status];
     if (error) {
         throw new ApiError(result, error);
@@ -247,6 +258,7 @@ function catchErrors(options: ApiRequestOptions, result: ApiResult): void {
     if (!result.ok) {
         throw new ApiError(result, 'Generic Error');
     }
+
 }
 
 /**

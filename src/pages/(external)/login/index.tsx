@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import type { z } from "zod"
 
@@ -20,72 +20,76 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 // import { useUserMutation } from "@/hooks/query/use-user"
+import { Code, type ResponseData } from "@/api"
+import { useUserMutation } from "@/hooks/query/use-user"
 import { cn } from "@/lib/utils"
 import type { ILoginForm } from "@/models/user"
 import { loginFormSchema } from "@/models/user"
-import { useMutation } from "@tanstack/react-query"
-import { postAuth } from "@/api/services/AuthService"
-import { Code, type ResponseData, type UserLogin } from "@/api"
+import type { TokenReponse } from "@/api/models/TokenResponse"
+import { getToken, setToken } from "@/storages/local-storage"
 
 export function Component() {
   const { t } = useTranslation()
-  return (
-    <div className="container relative grid h-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <Logo className="mr-2 size-6" />
-          {t("login.acme_inc")}
+  const isLogin = Boolean(getToken());
+  return <>
+    {!isLogin ?
+      <div className="container relative grid h-screen flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
+          <div className="absolute inset-0 bg-zinc-900" />
+          <div className="relative z-20 flex items-center text-lg font-medium">
+            <Logo className="mr-2 size-6" />
+            {t("login.acme_inc")}
+          </div>
+          <div className="relative z-20 mt-auto">
+            <blockquote className="space-y-2">
+              <p className="text-lg">
+                {t("login.intro.quote")}
+              </p>
+              <footer className="text-sm">
+                {t("login.intro.name")}
+              </footer>
+            </blockquote>
+          </div>
         </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              {t("login.intro.quote")}
-            </p>
-            <footer className="text-sm">
-              {t("login.intro.name")}
-            </footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className="lg:p-8">
-        <div className="absolute right-0 top-0 p-4">
-          <LanguageSwitch />
-        </div>
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              {t("login.create_account")}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {t("login.enter_email")}
+        <div className="lg:p-8">
+          <div className="absolute right-0 top-0 p-4">
+            <LanguageSwitch />
+          </div>
+          <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+            <div className="flex flex-col space-y-2 text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">
+                {t("login.create_account")}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {t("login.enter_email")}
+              </p>
+            </div>
+            <UserAuthForm />
+            <p className="px-8 text-center text-sm text-muted-foreground">
+              {t("login.terms_of_service")}
+              {" "}
+              <Link
+                to="/terms"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                {t("login.terms_of_service")}
+              </Link>
+              {" "}
+              and
+              {" "}
+              <Link
+                to="/privacy"
+                className="underline underline-offset-4 hover:text-primary"
+              >
+                {t("login.privacy_policy")}
+              </Link>
+              .
             </p>
           </div>
-          <UserAuthForm />
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            {t("login.terms_of_service")}
-            {" "}
-            <Link
-              to="/terms"
-              className="underline underline-offset-4 hover:text-primary"
-            >
-              {t("login.terms_of_service")}
-            </Link>
-            {" "}
-            and
-            {" "}
-            <Link
-              to="/privacy"
-              className="underline underline-offset-4 hover:text-primary"
-            >
-              {t("login.privacy_policy")}
-            </Link>
-            .
-          </p>
         </div>
-      </div>
-    </div>
-  )
+      </div> : <Navigate replace={true} to='/dashboard' />
+    }
+  </>
 }
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
@@ -93,17 +97,6 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> { }
 function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const { t } = useTranslation()
 
-  const useUserMutation = () => {
-    return useMutation({
-      mutationFn: async (params: any) => {
-        let bodyRequest: UserLogin = {
-          username: params.username,
-          password: params.password
-        }
-        return await postAuth("", bodyRequest)
-      }
-    })
-  }
   const loginMutation = useUserMutation()
   const navigate = useNavigate()
   const form = useForm<ILoginForm>({
@@ -118,17 +111,19 @@ function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     toast.promise(loginMutation.mutateAsync(values), {
       position: "top-center",
       loading: t("login.loading"),
-      success: (response: ResponseData) => {
-        console.log(response)
+      success: (response: ResponseData<TokenReponse>) => {
         if (response.code === Code._200) {
+          setToken(response.data?.token ?? "")
           navigate("/dashboard", {
             replace: true,
           })
           return t("login.login_successful")
         }
-        return response.message ?? t("login.error")
+        throw new Error(response.message ?? t("login.error"))
       },
-      error: t("login.error"),
+      error: (ex: Error) => {
+        return ex.message
+      },
     })
   }
 
@@ -149,7 +144,7 @@ function UserAuthForm({ className, ...props }: UserAuthFormProps) {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder={t("login.email_placeholder")}
+                      placeholder={t("login.username")}
                       type="text"
                       autoCapitalize="none"
                       autoComplete="off"

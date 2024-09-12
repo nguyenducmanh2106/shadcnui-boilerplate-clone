@@ -35,8 +35,7 @@ export const loginFormSchema = z.object({
     .string()
     .min(1, {
       message: "Username is required",
-    })
-    .email(),
+    }),
   password: z.string().min(1, {
     message: "Password is required",
   }),
