@@ -33,7 +33,8 @@ export function Component() {
       panel?.isCollapsed() ? panel?.expand() : panel?.collapse()
     }
   }
-  const isLogin = true ?? Boolean(getToken());
+  const isLogin = Boolean(getToken());
+  // console.log(isLogin)
   return <>
     {
       isLogin ?
