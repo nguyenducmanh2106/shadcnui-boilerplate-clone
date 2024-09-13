@@ -63,7 +63,36 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.ag-header-cell-resize {
+  color: transparent;
+}
+
+.ag-header-cell-resize:hover {
+  background-color: #0052cc;
+  color: #0052cc;
+}
+
+div.ag-theme-balham,
+div.ag-theme-balham-dark {
+  --ag-font-size: .875rem;
+  --ag-header-background-color: transparent;
+  --ag-odd-row-background-color: #fff;
+  --ag-header-column-separator-height: 100%;
+  --ag-row-border-color: hsl(var(--border));
+  --ag-border-color: hsl(var(--border));
+  --ag-checkbox-checked-color: hsl(var(--foreground));
+  --ag-selected-row-background-color: hsl(var(--muted));
+  --ag-row-hover-color: #f5f5f6;
+  --ag-header-foreground-color: hsl(var(--muted-foreground));
+  --ag-font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+  --ag-data-color: #212121;
+  --ag-header-column-separator-color: transparent;
+  /* --ag-checkbox-checked-color: hsl(var(--primary-foreground));
+  --ag-checkbox-background-color: hsl(var(--primary)); */
 }

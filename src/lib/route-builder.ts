@@ -77,7 +77,6 @@ export function buildGlobRoutes(
     }
 
     for (const key of pathKeys) {
-      console.log(key)
       const isGroupedRoute = key.startsWith("(") && key.endsWith(")")
 
       const segmentPathKey = parentKey + key
@@ -143,11 +142,10 @@ export function buildGlobRoutes(
         if (!hasChild) {
           const accessPath = `${segmentPathKey}.tsx`
           let globGetter = get(glob, accessPath)
-          // console.log(accessPath, globGetter)
-          if (normalizeKey == 'advanced-form') {
-            console.log("Không có quyền: ", key)
-            globGetter = get(glob, './pages/(admin)/(with-layout)/exception/403.tsx')
-          }
+          // if (normalizeKey == 'advanced-form') {
+          //   console.log("Không có quyền: ", key)
+          //   globGetter = get(glob, './pages/(admin)/(with-layout)/exception/403.tsx')
+          // }
           if (pathGetterSet.has(`${segmentPathKey}.tsx`)) {
             console.error(`duplicate path: ${accessPath}`)
           }

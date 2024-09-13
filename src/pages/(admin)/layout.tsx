@@ -34,7 +34,6 @@ export function Component() {
     }
   }
   const isLogin = Boolean(getToken());
-  // console.log(isLogin)
   return <>
     {
       isLogin ?

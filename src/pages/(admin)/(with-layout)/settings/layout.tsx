@@ -31,6 +31,10 @@ export function Component() {
       title: t("settings.nav.theme"),
       href: "/settings/theme",
     },
+    {
+      title: t("settings.nav.permissions"),
+      href: "/settings/permissions",
+    },
   ]
   return (
     <div className="space-y-6 p-10 py-0 md:block ">

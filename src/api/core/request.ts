@@ -8,6 +8,7 @@ import { CancelablePromise } from './CancelablePromise';
 import type { OnCancel } from './CancelablePromise';
 import { OpenAPI } from './OpenAPI';
 import { redirectToSignin } from '@/lib/api-fetch';
+import { getToken } from '@/storages/local-storage';
 
 function isDefined<T>(value: T | null | undefined): value is Exclude<T, null | undefined> {
     return value !== undefined && value !== null;
@@ -118,7 +119,7 @@ async function resolve<T>(options: ApiRequestOptions, resolver?: T | Resolver<T>
 }
 
 async function getHeaders(options: ApiRequestOptions): Promise<Headers> {
-    const token = await resolve(options, OpenAPI.TOKEN);
+    const token = await resolve(options, OpenAPI.TOKEN ?? getToken());
     const username = await resolve(options, OpenAPI.USERNAME);
     const password = await resolve(options, OpenAPI.PASSWORD);
     const additionalHeaders = await resolve(options, OpenAPI.HEADERS);

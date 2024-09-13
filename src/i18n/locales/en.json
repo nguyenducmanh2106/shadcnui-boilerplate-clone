@@ -129,7 +129,8 @@
       "appearance": "Appearance",
       "notifications": "Notifications",
       "display": "Display",
-      "theme": "Theme"
+      "theme": "Theme",
+      "permissions": "Permissions"
     },
     "profile": {
       "title": "Profile",
@@ -259,7 +260,8 @@
     "radial_chart": "Radial Chart",
     "tooltip_chart": "Tooltip Chart",
     "about": "About",
-    "table": "Table"
+    "table": "Table",
+    "permissions": "Permissions"
   },
   "user_nav": {
     "logout": "Log out",

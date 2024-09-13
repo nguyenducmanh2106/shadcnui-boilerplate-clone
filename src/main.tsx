@@ -1,5 +1,8 @@
 import "./styles/index.css"
 import "./i18n"
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-enterprise';
+import "ag-grid-community/styles/ag-theme-balham.min.css";
 
 import { env } from "@env"
 // @ts-expect-error
